@@ -160,7 +160,7 @@ public class NoteController {
 	
 	
 	
-	@DeleteMapping("/note/{id}")
+	@DeleteMapping("/notes/{id}")
 	public ResponseEntity<Void> deleteNote(@PathVariable("id") String id) {
 		noteService.deleteNote(id);
 		return ResponseEntity.status(HttpStatus.ACCEPTED).build();

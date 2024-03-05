@@ -101,7 +101,7 @@ PUT http://localhost:8080/api/notes
 
 ```
 
-get order by id
+get notes by id
 
 ```bash
 
