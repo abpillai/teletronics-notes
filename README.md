@@ -79,6 +79,14 @@ POST http://localhost:8080/api/notes
 
 ```
 
+get note statistics
+
+```bash
+
+GET http://localhost:8080/api/notes/{id}/stats
+
+```
+
 update note
 
 ```bash
