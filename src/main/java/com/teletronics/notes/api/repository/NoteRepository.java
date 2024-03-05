@@ -22,7 +22,7 @@ public interface NoteRepository extends MongoRepository<Note, ObjectId>  {
 			"{ $unwind: '$i18n_data' }", 
 			"{ $match: {'i18n_data.language': ?0, deleted: {$in: [null, false]} }}",
 			"{ $replaceWith: { $mergeObjects: [ '$$ROOT', '$i18n_data' ]}}",
-			"{ $addFields: { 'e_id' : { $toString: '$_id' }, 'expertId': { $toString: '$author' }, 'categoryId': { $toString: '$category' }, 'noteTagIds' : { $map: { input: '$note_tags', as: 'noteTagId', in: { $toString: '$$noteTagId' }}}}}",
+			"{ $addFields: { 'e_id' : { $toString: '$_id' }, 'noteTagIds' : { $map: { input: '$note_tags', as: 'noteTagId', in: { $toString: '$$noteTagId' }}}}}",
 			"{ $project: { 'i18n_data' : 0, '_id': 0, '_class': 0, 'note_tags': 0, 'text': 0 } }"
 	})
 	List<NoteVO> findAllByLanguage(SupportedLocale language, Pageable page);
