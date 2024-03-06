@@ -10,6 +10,12 @@ Build the project.
 mvn clean install
 ```
 
+Run the JAR.
+
+```bash
+java -jar -Dspring.profiles.active=dev target/note-service-0.0.1-SNAPSHOT.jar
+```
+
 Build docker image.
 
 ```bash
