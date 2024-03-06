@@ -61,6 +61,21 @@ public class NoteControllerTest {
 	}
 
 	@Test
+	void createInvalidNoteTag() throws Exception {
+
+		String json = "{\n" + "  \"name\": \"TEST\"\n" + " \n" + "}";
+		ObjectMapper mapper = new ObjectMapper();
+		NoteTagVO vo = mapper.readValue(json, NoteTagVO.class);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/tags").content(TestUtil.convertObjectToJsonBytes(vo))
+				.contentType(MediaType.APPLICATION_JSON).header("Content-Language", "EN")
+				.accept(MediaType.APPLICATION_JSON))
+
+				.andExpect(status().isBadRequest());
+
+	}
+
+	@Test
 	void createNoteTag() throws Exception {
 
 		String json = "{\n" + "  \"name\": \"BUSINESS\"\n" + " \n" + "}";
@@ -72,6 +87,23 @@ public class NoteControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/tags/" + result.getId()).header("Content-Language", "EN"))
 
 				.andExpect(jsonPath("$.id").value(result.getId())).andExpect(status().isOk());
+
+	}
+
+	@Test
+	void createNoteTagWithInvalidTag() throws Exception {
+
+		String json = "{\n" + "  \"title\": \"Telematics\",\n" + "  \"text\": \"This is telematics2\",\n"
+				+ "  \"noteTagIds\": [\n" + "    \"65e60c57ab45255618975814\"\n" + "  ]\n" + "}";
+		ObjectMapper mapper = new ObjectMapper();
+		NoteVO vo = mapper.readValue(json, NoteVO.class);
+
+		NoteVO result = noteService.saveNote(vo, Optional.empty(), SupportedLocale.EN);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/notes/" + result.getId()).header("Content-Language", "EN"))
+
+				.andExpect(jsonPath("$.id").value(result.getId())).andExpect(jsonPath("$.noteTagIds").isEmpty())
+				.andExpect(status().isOk());
 
 	}
 
@@ -88,6 +120,38 @@ public class NoteControllerTest {
 				.accept(MediaType.APPLICATION_JSON))
 
 				.andExpect(jsonPath("$.id").exists()).andExpect(status().isOk());
+
+	}
+	
+	@Test
+	void createNoteWithoutTitle() throws Exception {
+
+		String json = "{\n"  + "  \"text\": \"This is telematics2\",\n"
+				+ "  \"noteTagIds\": [\n" + "    \"65e60c57ab45255618975814\"\n" + "  ]\n" + "}";
+		ObjectMapper mapper = new ObjectMapper();
+		NoteVO vo = mapper.readValue(json, NoteVO.class);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/notes").content(TestUtil.convertObjectToJsonBytes(vo))
+				.contentType(MediaType.APPLICATION_JSON).header("Content-Language", "EN")
+				.accept(MediaType.APPLICATION_JSON))
+
+			.andExpect(status().isBadRequest());
+
+	}
+	
+	@Test
+	void createNoteWithoutText() throws Exception {
+
+		String json = "{\n"  + "  \"title\": \"This is telematics2\",\n"
+				+ "  \"noteTagIds\": [\n" + "    \"65e60c57ab45255618975814\"\n" + "  ]\n" + "}";
+		ObjectMapper mapper = new ObjectMapper();
+		NoteVO vo = mapper.readValue(json, NoteVO.class);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/notes").content(TestUtil.convertObjectToJsonBytes(vo))
+				.contentType(MediaType.APPLICATION_JSON).header("Content-Language", "EN")
+				.accept(MediaType.APPLICATION_JSON))
+
+			.andExpect(status().isBadRequest());
 
 	}
 
@@ -161,7 +225,6 @@ public class NoteControllerTest {
 		NoteVO vo = mapper.readValue(json, NoteVO.class);
 
 		NoteVO result = noteService.saveNote(vo, Optional.empty(), SupportedLocale.EN);
-		
 
 		String jsonPut = "{\n" + "    \"id\": \"" + result.getId() + "\",\n" + "    \"title\": \"New Title\",\n"
 				+ "    \"text\": \"hello1 alan i am here where are you and what are you doing hello are you there\",\n"
@@ -177,7 +240,7 @@ public class NoteControllerTest {
 				.andExpect(status().isOk());
 
 	}
-	
+
 	@Test
 	void deleteNoteById() throws Exception {
 
@@ -191,11 +254,10 @@ public class NoteControllerTest {
 
 		mockMvc.perform(MockMvcRequestBuilders.delete("/api/notes/" + result.getId()).header("Content-Language", "EN"))
 
-				
-				.andExpect(status().is4xxClientError());
+				.andExpect(status().isAccepted());
 
 	}
-	
+
 	@Test
 	void getNoteStatsById() throws Exception {
 
@@ -207,10 +269,12 @@ public class NoteControllerTest {
 		NoteVO result = noteService.saveNote(vo, Optional.empty(), SupportedLocale.EN);
 		log.info("id:" + result.getId());
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/api/notes/" + result.getId()+ "/stats").header("Content-Language", "EN"))
+		mockMvc.perform(
+				MockMvcRequestBuilders.get("/api/notes/" + result.getId() + "/stats").header("Content-Language", "EN"))
 
-		.andExpect(jsonPath("$.id").value(result.getId())).andExpect(jsonPath("$.stats").exists())
-				.andExpect(status().isOk());
+				.andExpect(jsonPath("$.id").value(result.getId())).andExpect(jsonPath("$.stats").exists())
+				.andExpect(status().isOk()).andExpect(jsonPath("$.stats.this").value("1"))
+				.andExpect(jsonPath("$.stats.telematics2").value("1")).andExpect(jsonPath("$.stats.is").value("1"));
 
 	}
 
