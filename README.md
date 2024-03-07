@@ -25,7 +25,7 @@ docker build --build-arg JAR_FILE=target/note-service-0.0.1-SNAPSHOT.jar -t tele
 Run docker image.
 
 ```bash
-sudo docker run teletronics/notes
+sudo docker run --network mongoCluster -p 8080:8080 teletronics/notes
 ```
 
 This project uses Mongo DB. Please install mongodb as a replica set. Please run the following commands:
